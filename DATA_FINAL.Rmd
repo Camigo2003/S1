@@ -1,0 +1,52 @@
+```{r}
+library(rio)
+ANALFABETISMO = import("ANALFABETISMO2.xlsx")
+GINI = import("GINI.xlsx")
+LENGUA = import("LENGUA.xlsx")
+SEXO = import ("SEXO.xlsx")
+NBI = import("NBI.xlsx")
+URBANOEINTER = import ("URBANO E INTERNET.xlsx")
+PASIVOS = import("PASIVOSAMBIENTALES.xlsx")
+POBLACION = import("POBLACION.xlsx")
+```
+
+```{r}
+library(dplyr)
+library(purrr)
+
+
+# Unir todos los data frames usando full_join
+data_final <- merge(merge(merge(ANALFABETISMO, GINI, by= "PROVINCIA", all =FALSE ), LENGUA, by="PROVINCIA", all= FALSE),NBI, by = "PROVINCIA", all = FALSE)
+```
+
+```{r}
+names(data_final)[6]="PORCENTAJEANALFABETISMO"
+names(data_final)[12]="PORCENTAJEGINI"
+names(data_final)[20]="POBLACIONTOTAL"
+names(data_final)[68]="PORCENTAJELENGUA"
+names(data_final)[70]="PORCENTAJENBI"
+```
+
+```{r}
+data_final1=data_final[c(1,6,12,20,68,70)]
+```
+
+```{r}
+data_finale <- merge(merge(merge(data_final1, PASIVOS, by= "PROVINCIA", all =FALSE ), SEXO, by="PROVINCIA", all= FALSE),URBANOEINTER, by = "PROVINCIA", all = FALSE)
+```
+
+```{r}
+names(data_finale)[12]="CANTIDADPASIVOS"
+names(data_finale)[13]="HOMBRES"
+names(data_finale)[14]="MUJERES"
+names(data_finale)[15]="URBANO"
+names(data_finale)[16]="RURAL"
+names(data_finale)[17]="CONWIFI"
+names(data_finale)[18]="SINWIFI"
+```
+
+```{r}
+data_finalultimatum=data_finale[c(1,2,4,5,6,12,13,14,15,16,17,18)]
+```
+
+
