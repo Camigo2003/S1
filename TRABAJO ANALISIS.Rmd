@@ -1,0 +1,256 @@
+---
+title: "Analfabetismo en el Perú"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(rio)
+library(kableExtra)
+
+```
+
+Sidebar {.sidebar}
+-----------------------------------------------------------------------
+
+### Indice
+- [Hipótesis 1]
+- [Hipótesis 2]
+- [Hipótesis 3]
+- [Hipótesis 4]
+- [Hipótesis 5]
+- [Hipótesis 6]
+- [Hipótesis 7]
+- [Annova]
+- [Analisis ]
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Información General
+<div style="font-size: 14px;">
+En primer lugar, se considera a una persona como analfabeta cuando tiene 15 y más años de edad y no sabe leer ni escribir. Las preguntas para captar a la población analfabeta y alfabeta en la Encuesta Nacional de Hogares tienen el siguiente procedimiento:
+
+1. Se pregunta el nivel de educación logrado de las personas entrevistadas.  
+2. A las personas con primaria incompleta o menor nivel educativo, se les consulta si tienen la habilidad de leer y escribir.  
+3. A las personas que respondieron afirmativamente, se les pide leer una cartilla para corroborar si efectivamente saben leer.
+</div>
+
+
+
+Column {#hipotesis-1}
+-----------------------------------------------------------------------
+
+### Hipótesis 1
+<div style="font-size: 14px;">
+El dato más mencionado en los trabajos académicos ha sido que los espacios rurales son los que mayor presentan niveles de analfabetismo, es por ello que considerarlo una variable que afecta a la dependiente es fundamental. Esto es posible a que las zonas rurales cuentan con menos accesos a servicios educativos, subiendo el porcentaje de personas analfabetas. Según los resultados se han encontrado que el coeficiente es altamente significativo (p<0.001), lo que indica una fuerte asociación positiva entre el porcentaje de zonas rurales y el porcentaje de analfabetismo.Sin embargo, se encuentra que otras variables podrían ayudar al modelo
+</div>
+
+---
+
+#### **1.1. Resultado del modelo**
+```{r}
+# Hipotesis 1.1 en R
+mi_tabla = import("mi_tabla.csv")
+modelo1=lm(mi_tabla$PORCENTAJEANALFABETISMO~mi_tabla$`Rural porcentaje`)
+
+summary(modelo1)
+
+library(modelsummary)
+library(kableExtra)
+model1=list('Resultado'= modelo1)
+modelsummary(model1, title = "Regresion: modelo 1",
+             stars = TRUE,
+             output = "kableExtra")
+```
+
+---
+
+#### **1.1. Gráfico del modelo**
+```{r}
+plot(mi_tabla$`Rural porcentaje`, mi_tabla$PORCENTAJEANALFABETISMO, main = "Relación entre analfabetismo y zonas rurales",
+     xlab = "Porcentaje en zonas rurales", ylab = "Porcentaje de analfabetismo", pch = 19)
+abline(modelo1, col = "blue", lwd = 2)
+
+```
+
+### Hipótesis 2 {#hipotesis-2}
+<div style="font-size: 14px;">
+El wifi ha sido una herramienta importante para la educación, especialmente durante el COVID 19 lo cual nos parece relevante analizar. Según los resultados se han encontrado que el coeficiente es altamente significativo (p<0.001), lo que indica una fuerte asociación positiva entre el porcentaje de zonas sin wifi y el porcentaje de analfabetismo.Sin embargo, se encuentra que otras variables podrían ayudar al modelo
+</div>
+
+```{r}
+# hipotesis 2.1 en R
+modelo2=lm(mi_tabla$PORCENTAJEANALFABETISMO~mi_tabla$`SIN WIFI`)
+
+summary(modelo2)
+
+library(modelsummary)
+library(kableExtra)
+model2=list('Resultado'= modelo2)
+modelsummary(model2, title = "Regresion: modelo 2",
+             stars = TRUE,
+             output = "kableExtra")
+```
+---
+```{r}
+plot(mi_tabla$`SIN WIFI`, mi_tabla$PORCENTAJEANALFABETISMO, main = "Relación entre analfabetismo y zonas rurales",
+     xlab = "Porcentaje en zonas sin wifi", ylab = "Porcentaje de analfabetismo", pch = 19)
+abline(modelo2, col = "blue", lwd = 2)
+```
+---
+
+### Hipótesis 3 {#hipotesis-3}
+<div style="font-size: 14px;">
+Las diferentes lenguas del Perú causan que ciertas personas no puedan acceder a la educación debido a que no hay colegios o personal especializado a su idioma, lo que puede llevar  amayores tazas de analfabetismo. Según los resultados se han encontrado que el coeficiente es altamente significativo (p<0.001), lo que indica una fuerte asociación positiva entre el porcentaje de provincias con lenguas diferentes y el porcentaje de analfabetismo.Sin embargo, se encuentra que otras variables podrían ayudar al modelo
+</div>
+
+```{r}
+# hipotesis 3.1 en R
+modelo3=lm(mi_tabla$PORCENTAJEANALFABETISMO~mi_tabla$PORCENTAJELENGUA)
+
+summary(modelo3)
+
+library(modelsummary)
+library(kableExtra)
+model3=list('Resultado'= modelo3)
+modelsummary(model3, title = "Regresion: modelo 3",
+             stars = TRUE,
+             output = "kableExtra")
+```
+---
+```{r}
+plot(mi_tabla$PORCENTAJELENGUA, mi_tabla$PORCENTAJEANALFABETISMO, main = "Relación entre analfabetismo y lugares con diversas lenguas",
+     xlab = "Porcentaje en lenguas", ylab = "Porcentaje de analfabetismo", pch = 19)
+abline(modelo2, col = "blue", lwd = 2)
+```
+---
+
+
+### Hipótesis 4 {#hipotesis-4}
+<div style="font-size: 14px;">
+Las necesidades basicas insatisfechas pueden causar que las personas se les dificulte acceder o aprovechar de manera correcta la educación debido a otras necesidades que no se esten cumpliendo. Según los resultados se han encontrado que el coeficiente no es significativo, lo que indica no asociación entre el porcentaje de zonas rurales y el porcentaje de analfabetismo. Esto implica que los NBIs no son una variable independiente relevante para la analfabetizacion
+</div>
+
+```{r}
+# hipotesis 4.1 en R
+modelo4=lm(mi_tabla$PORCENTAJEANALFABETISMO~mi_tabla$PORCENTAJENBI)
+
+summary(modelo4)
+
+library(modelsummary)
+library(kableExtra)
+model4=list('Resultado'= modelo4)
+modelsummary(model4, title = "Regresion: modelo 4",
+             stars = TRUE,
+             output = "kableExtra")
+```
+---
+```{r}
+plot(mi_tabla$PORCENTAJENBI, mi_tabla$PORCENTAJEANALFABETISMO, main = "Relación entre analfabetismo y lugares con diversas lenguas",
+     xlab = "Porcentaje en NBI", ylab = "Porcentaje de analfabetismo", pch = 19)
+abline(modelo2, col = "blue", lwd = 2)
+```
+---
+
+### Hipótesis 5 {#hipotesis-5}
+<div style="font-size: 14px;">
+Las mujeres usualmente no encuentran un espacio en la educación a veces dependiendo de su situacion sea familiar, economica, entre otras.Se han encontrado que el coeficiente es altamente significativo (p<0.001), lo que indica una fuerte asociación positiva entre el porcentaje de zonas rurales y el porcentaje de analfabetismo.Sin embargo, se encuentra que otras variables podrían ayudar al modelo
+</div>
+
+
+```{r}
+# hipotesis 5.1 en R
+modelo5=lm(mi_tabla$PORCENTAJEANALFABETISMO~mi_tabla$`Porcentaje Mujer`)
+
+summary(modelo5)
+
+library(modelsummary)
+library(kableExtra)
+model5=list('Resultado'= modelo5)
+modelsummary(model5, title = "Regresion: modelo 5",
+             stars = TRUE,
+             output = "kableExtra")
+```
+---
+```{r}
+plot(mi_tabla$`Porcentaje Mujer`, mi_tabla$PORCENTAJEANALFABETISMO, main = "Relación entre analfabetismo y lugares con diversas lenguas",
+     xlab = "Porcentaje de mujeres", ylab = "Porcentaje de analfabetismo", pch = 19)
+abline(modelo2, col = "blue", lwd = 2)
+```
+---
+
+### Hipótesis 6 {#hipotesis-6}
+<div style="font-size: 14px;">
+Se ha visto modelos anidados donde las zonas rurales usualmente comparten relacion con las zonas que no tienen acceso a Internet.Se han encontrado que el coeficiente es altamente significativo (p<0.001), lo que indica una fuerte asociación positiva entre el porcentaje de zonas rurales, zonas sin acceso a internet y el porcentaje de analfabetismo.
+</div>
+```{r}
+# hipotesis 6.1 en R
+modelo6=lm(mi_tabla$PORCENTAJEANALFABETISMO~mi_tabla$`Rural porcentaje`+ mi_tabla$`SIN WIFI`)
+
+summary(modelo6)
+
+library(modelsummary)
+library(kableExtra)
+model6=list('Resultado'= modelo6)
+modelsummary(model6, title = "Regresion: modelo 6",
+             stars = TRUE,
+             output = "kableExtra")
+```
+---
+
+
+### Hipótesis 7 {#hipotesis-7}
+<div style="font-size: 14px;">
+Se ha visto modelos anidados donde las zonas rurales usualmente comparten relacion con las zonas que no tienen acceso a Internet.Aparte, se ha decidido incluir el valor de lengua para ver si este influia en un mejor modelo. Se han encontrado que el coeficiente es altamente significativo (p<0.001), lo que indica una fuerte asociación positiva entre el porcentaje de zonas rurales, zonas sin acceso a internet y el porcentaje de analfabetismo.
+</div>
+```{r}
+# hipotesis 7.1 en R
+modelo7=lm(mi_tabla$PORCENTAJEANALFABETISMO~mi_tabla$`Rural porcentaje`+ mi_tabla$`SIN WIFI`+mi_tabla$PORCENTAJELENGUA)
+
+summary(modelo7)
+
+library(modelsummary)
+library(kableExtra)
+model7=list('Resultado'= modelo7)
+modelsummary(model6, title = "Regresion: modelo 7",
+             stars = TRUE,
+             output = "kableExtra")
+```
+---
+
+### Annova
+<div style="font-size: 14px;">
+De los modelos podemos encontrar que el mejor modelo es el 7 debido a que es el más significativo mostrandonos un modelo anidado completo
+</div>
+
+```{r}
+anova(modelo1, modelo2, modelo3, modelo4, modelo5, modelo6, modelo7)
+```
+
+---
+
+#ANALISIS FACTORIAL
+<div style="font-size: 14px;">
+Se ha encontrado dos factores relevantes: Las variables Rural porcentaje, SIN WIFI, y PORCENTAJENBI están fuertemente correlacionadas con PORCENTAJEANALFABETISMO, lo que las convierte en predictores clave para estudiar el fenómeno del analfabetismo. Las correlaciones negativas con CON WIFI destacan la importancia del acceso a la tecnología como un factor determinante para mejorar la alfabetización.
+</div>
+```{r}
+library(polycor)
+library(dplyr)
+data_nueva <- mi_tabla %>% select(-UBIGEO, -PROVINCIA, -Departamento)
+corMatrix=polycor::hetcor(data_nueva)$correlations
+round(corMatrix,2)
+library(ggcorrplot)
+
+ggcorrplot(corMatrix)
+```
+---
+
+
+
+
+
+
