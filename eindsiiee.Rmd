@@ -1,0 +1,468 @@
+```{r setup, include=FALSE}
+# Importing libraries
+library(flexdashboard)
+library(tidyverse)
+library(highcharter)
+library(gt)
+library(htmltools)
+library(viridis)
+library(rio)
+library(broom)
+```
+
+
+```{r}
+# Importing data
+df <- import("mi_tabla.csv")
+dfextra =import("disca.xlsx")
+names(dfextra)[names(dfextra) == "Provincia"] <- "PROVINCIA"
+result <- merge(df, dfextra, by = "PROVINCIA")
+```
+
+
+```{r}
+#TRABAJAMOS CON SPEARMAN
+f1=formula(~result$PORCENTAJEANALFABETISMO + result$`SIN WIFI`)
+```
+
+```{r}
+spearmanf1=cor.test(f1,data=result,method='spearman',exact=F)[c('estimate','p.value')]
+spearmanf1
+```
+
+
+```{r fig.height=5}
+
+#Analisis de los datos
+modelo1=lm(df$PORCENTAJEANALFABETISMO~df$`Rural porcentaje`)
+
+summary(modelo1)
+```
+
+### Tabla de datos {data-height=600}
+
+```{r fig.height=5}
+library(modelsummary)
+library(kableExtra)
+model1=list('Resultado'= modelo1)
+modelsummary(model1, title = "Regresion: modelo 1",
+             stars = TRUE,
+             output = "kableExtra")
+
+```
+
+### Grafico {data-height=600}
+
+```{r fig.height=5}
+plot(df$`Rural porcentaje`, df$PORCENTAJEANALFABETISMO, main = "Relación entre analfabetismo y zonas rurales",
+     xlab = "Porcentaje en zonas rurales", ylab = "Porcentaje de analfabetismo", pch = 19)
+abline(modelo1, col = "blue", lwd = 2)
+```
+
+### Resultado {data-height=100}
+
+La taza rural 
+
+
+Hipotesis 2 {data-orientation=rows}
+=======================================================================
+
+## Row 1 {data-height=100}
+
+Column {.tabset .tabset-fade data-width=650}
+-----------------------------------------------------------------------
+
+### El porcentaje de analfabetismo es afectado por si hay un menor o mayor porcentaje de zonas rurales en las provincias {data-height=600}
+
+```{r fig.height=6}
+#Analisis de los datos
+modelo2=lm(df$PORCENTAJEANALFABETISMO~df$`CON WIFI`)
+
+summary(modelo2)
+```
+
+### Tabla de datos {data-height=600}
+
+```{r fig.height=6}
+library(modelsummary)
+library(kableExtra)
+model2=list('Resultado'= modelo2)
+modelsummary(model2, title = "Regresion: modelo 2",
+             stars = TRUE,
+             output = "kableExtra")
+```
+
+### Grafico {data-height=600}
+
+```{r fig.height=5}
+plot(df$`SIN WIFI`, df$PORCENTAJEANALFABETISMO, main = "Relación entre analfabetismo y zonas rurales",
+     xlab = "Porcentaje en zonas sin wifi", ylab = "Porcentaje de analfabetismo", pch = 19)
+abline(modelo2, col = "blue", lwd = 2)
+```
+
+
+### Resultado {data-height=100}
+
+La taza rural 
+
+
+Hipotesis 3 {data-orientation=rows}
+=======================================================================
+
+## Row 1 {data-height=100}
+
+Column {.tabset .tabset-fade data-width=650}
+-----------------------------------------------------------------------
+
+### El porcentaje de analfabetismo es afectado por si hay un menor o mayor porcentaje de zonas rurales en las provincias {data-height=600}
+
+```{r fig.height=6}
+modelo3=lm(df$PORCENTAJEANALFABETISMO~df$PORCENTAJELENGUA)
+
+summary(modelo3)
+
+```
+
+### Grafico {data-height=600}
+
+```{r fig.height=5}
+library(modelsummary)
+library(kableExtra)
+model3=list('Resultado'= modelo3)
+modelsummary(model3, title = "Regresion: modelo 3",
+             stars = TRUE,
+             output = "kableExtra")
+```
+
+### Resultado {data-height=100}
+
+```{r}
+plot(df$PORCENTAJELENGUA, df$PORCENTAJEANALFABETISMO, main = "Relación entre analfabetismo y lugares con diversas lenguas",
+     xlab = "Porcentaje en lenguas", ylab = "Porcentaje de analfabetismo", pch = 19)
+abline(modelo2, col = "blue", lwd = 2)
+```
+
+
+
+Hipotesis 4 {data-orientation=rows}
+=======================================================================
+
+## Row 1 {data-height=100}
+
+Column {.tabset .tabset-fade data-width=650}
+-----------------------------------------------------------------------
+
+### El porcentaje de analfabetismo es afectado por si hay un menor o mayor porcentaje de zonas rurales en las provincias {data-height=600}
+
+```{r fig.height=6}
+#Analisis de los datos
+modelo5=lm(df$PORCENTAJEANALFABETISMO~df$`Porcentaje Mujer`)
+summary(modelo5)
+
+```
+
+### Grafico {data-height=600}
+
+```{r fig.height=5}
+library(modelsummary)
+library(kableExtra)
+model5=list('Resultado'= modelo5)
+modelsummary(model5, title = "Regresion: modelo 5",
+             stars = TRUE,
+             output = "kableExtra")
+```
+
+### Resultado {data-height=100}
+
+```{r}
+plot(df$`Porcentaje Mujer`, df$PORCENTAJEANALFABETISMO, main = "Relación entre analfabetismo y lugares con diversas lenguas",
+     xlab = "Porcentaje de mujeres", ylab = "Porcentaje de analfabetismo", pch = 19)
+abline(modelo2, col = "blue", lwd = 2)
+```
+
+
+Hipotesis 5 {data-orientation=rows}
+=======================================================================
+
+## Row 1 {data-height=100}
+
+Column {.tabset .tabset-fade data-width=650}
+-----------------------------------------------------------------------
+
+### El porcentaje de analfabetismo es afectado por si hay un menor o mayor porcentaje de zonas rurales en las provincias {data-height=600}
+
+```{r fig.height=6}
+modelo6=lm(result$PORCENTAJEANALFABETISMO~result$`Rural porcentaje`+ result$PORCENTAJELENGUA)
+summary(modelo6)
+
+reg6=lm(modelo6,data=result)
+summary(reg6)
+```
+```{r}
+# Eliminar filas con valores faltantes en las columnas predictoras
+df <- na.omit(df[, c("PORCENTAJEANALFABETISMO", "Rural porcentaje", "PORCENTAJELENGUA")])
+
+# Ajustar el modelo nuevamente
+modelo6 <- lm(PORCENTAJEANALFABETISMO ~ `Rural porcentaje` + PORCENTAJELENGUA, data = df)
+
+# Predicciones
+df$PORCENTAJEANALFABETISMO_PRED <- predict(modelo6)
+
+library(ggplot2)
+
+ggplot(df, aes(x = `Rural porcentaje`, y = PORCENTAJEANALFABETISMO)) +
+  geom_point(color = "blue") +
+  geom_line(aes(y = PORCENTAJEANALFABETISMO_PRED), color = "red", size = 1) +
+  labs(title = "Predicción del Porcentaje de Analfabetismo",
+       x = "Rural (%)", y = "Analfabetismo (%)") +
+  theme_minimal()
+
+
+```
+
+### Grafico {data-height=600}
+
+```{r fig.height=5}
+library(modelsummary)
+library(kableExtra)
+model6=list('Resultado'= modelo6)
+modelsummary(model6, title = "Regresion: modelo 5",
+             stars = TRUE,
+             output = "kableExtra")
+```
+
+
+
+
+Hipotesis 6 {data-orientation=rows}
+=======================================================================
+
+## Row 1 {data-height=100}
+
+Column {.tabset .tabset-fade data-width=650}
+-----------------------------------------------------------------------
+
+### El porcentaje de analfabetismo es afectado por si hay un menor o mayor porcentaje de zonas rurales en las provincias {data-height=600}
+
+```{r fig.height=6}
+modelo7=lm(result$PORCENTAJEANALFABETISMO~result$`Rural porcentaje`+result$PORCENTAJELENGUA+result$`Porcentaje Mujer`)
+summary(modelo7)
+reg7=lm(modelo7,data=result)
+summary(reg7)
+
+```
+```{r}
+
+
+```
+
+
+```{r}
+modelo8=lm(result$PORCENTAJEANALFABETISMO~result$`Rural porcentaje`+result$PORCENTAJELENGUA+result$`Porcentaje Mujer`+result$`SIN WIFI`)
+summary(modelo8)
+reg8=lm(modelo8,data=result)
+summary(reg8)
+```
+```{r}
+library(modelsummary)
+models=list('apropiacion (I)'=reg6,
+            'apropiacion (II)'= reg7,
+            'apropiacion (III)'= reg8)
+modelsummary(models, title = "Resultados de todos los modelos",
+             stars = TRUE,
+             output = "kableExtra")
+```
+
+```{r}
+models=list('apropiacion (I)'=reg1,
+            'apropiacion (II)'=reg2,
+            'apropiacion (III)'=reg3)
+modelsummary(models, title = "Resultados de todos los modelos",statistic = "conf.int",
+             stars = TRUE,
+             output = "kableExtra")
+```
+
+```{r}
+library(ggplot2)
+library(sjPlot)
+
+
+plot_models(reg6,reg7,reg8,vline.color = "black",m.labels=c("Modelo 1","Modelo 2","Modelo 3"),dot.size = 1,line.size = 0.6)
+```
+
+```{r}
+library(magrittr)
+library(knitr)
+tanova=anova(reg6,reg7,reg8)
+
+kable(tanova,
+      caption = "Tabla ANOVA para comparar modelos")%>%kableExtra::kable_styling(full_width = FALSE)
+```
+
+```{r}
+# linea roja debe tender a horizontal
+plot(reg8, 1)
+```
+```{r}
+# linea roja debe tender a horizontal
+plot(reg8, 3)
+```
+```{r}
+library(lmtest)
+library(kableExtra)
+# null: modelo homocedastico
+resBP=bptest(reg8)
+data.frame(list('BP'=resBP$statistic,
+             'df'=resBP$parameter,
+             "p-value"=resBP$p.value))%>%
+    kable(caption = resBP$method)%>%kable_styling(full_width = F)
+```
+
+```{r}
+# puntos cerca a la diagonal?
+plot(reg8, 2)
+```
+
+```{r}
+#NULL: Datos se distribuyen de manera normal
+resSW=shapiro.test(reg8$residuals)
+data.frame(list('SW'=resSW$statistic,
+             "p-value"=resSW$p.value))%>%
+    kable(caption = resSW$method)%>%kable_styling(full_width = F)
+```
+```{r}
+library(DescTools)
+# > 5 es problematico
+VIF(reg8) %>%kable(col.names = "VIF",caption ="Evaluando Multicolinealidad usando VIF (Variance Inflation Factors)" )%>%kable_styling(full_width = F)
+```
+```{r}
+plot(reg8, 5)
+```
+
+```{r}
+checkReg2=as.data.frame(influence.measures(reg8)$is.inf)
+checkReg2[checkReg2$cook.d & checkReg2$hat,c('cook.d','hat')]%>%kable(caption = "Valores Influyentes criticos")%>%kable_styling(full_width = F)
+```
+
+```{r}
+datos_porcentajes <- result[, c("Rural porcentaje", "SIN WIFI", "PORCENTAJELENGUA", "Porcentaje Mujer")]
+```
+
+
+#ANALISIS FACTORIAL
+
+```{r}
+library(polycor)
+corMatrix=polycor::hetcor(datos_porcentajes)$correlations
+```
+
+```{r}
+round(corMatrix,2)
+```
+
+```{r}
+library(ggcorrplot)
+
+ggcorrplot(corMatrix)
+```
+```{r}
+library(psych)
+psych::KMO(corMatrix) 
+```
+```{r}
+cor(datos1[,c(51:53)])
+```
+
+```{r}
+library(BBmisc)
+boxplot(normalize(result[,c(4,6,8,10)],method='standardize'))
+
+dataClus=result[,c(4,6,8,10)]
+row.names(dataClus)=result$PROVINCIA
+
+library(cluster)
+g.dist = daisy(dataClus, metric="gower")
+```
+
+```{r}
+## para PAM
+
+library(factoextra)
+fviz_nbclust(dataClus, pam,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F)
+```
+
+```{r}
+library(kableExtra)
+set.seed(123)
+res.pam=pam(g.dist,2,cluster.only = F)
+
+#nueva columna
+dataClus$pam=res.pam$cluster
+
+# ver
+
+head(dataClus,15)%>%kbl()%>%kable_styling()
+```
+
+```{r}
+fviz_silhouette(res.pam,print.summary = F)
+```
+```{r}
+silPAM=data.frame(res.pam$silinfo$widths)
+silPAM$country=row.names(silPAM)
+poorPAM=silPAM[silPAM$sil_width<0,'country']%>%sort()
+poorPAM
+```
+```{r}
+# PARA JERARQUICO
+
+fviz_nbclust(dataClus, hcut,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F,hc_func = "agnes")
+```
+
+
+```{r}
+set.seed(123)
+library(factoextra)
+
+res.agnes<- hcut(g.dist, k = 3,hc_func='agnes',hc_method = "ward.D")
+
+dataClus$agnes=res.agnes$cluster
+
+# ver
+
+head(dataClus,15)%>%kbl()%>%kable_styling()
+```
+```{r}
+fviz_silhouette(res.agnes,print.summary = F)
+```
+
+```{r}
+silAGNES=data.frame(res.agnes$silinfo$widths)
+silAGNES$country=row.names(silAGNES)
+poorAGNES=silAGNES[silAGNES$sil_width<0,'country']%>%sort()
+poorAGNES
+```
+
+```{r}
+fviz_nbclust(dataClus, hcut,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F,hc_func = "diana")
+```
+```{r}
+set.seed(123)
+res.diana <- hcut(g.dist, k = 2,hc_func='diana')
+dataClus$diana=res.diana$cluster
+# veamos
+head(dataClus,15)%>%kbl%>%kable_styling()
+```
+
+
+```{r}
+fviz_silhouette(res.diana,print.summary = F)
+```
+```{r}
+silDIANA=data.frame(res.diana$silinfo$widths)
+silDIANA$country=row.names(silDIANA)
+poorDIANA=silDIANA[silDIANA$sil_width<0,'country']%>%sort()
+poorDIANA
+```
+
+
